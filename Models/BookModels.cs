@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,9 +12,9 @@ namespace LibManager.Models
     {
         private ObservableCollection<Book> _books = new ObservableCollection<Book>
         {
-            new Book("title:1", "owner:1", "donor:1", "id:1", "externalUrl:1"),
-            new Book("title:2", "owner:2", "donor:2", "id:2", "externalUrl:2"),
-            new Book("title:3", "owner:3", "donor:3", "id:3", "externalUrl:3")
+            new Book("OnePiece","donor-1", "00000001", "https://onepiece/not-exist.com"),
+            new Book("DragonBall","donor-2", "00000002", "https://dragonball/not-exist.com"),
+            new Book("Naruto", "donor-3", "00000003", "https://naruto/not-exist.com")
         };
 
         public ObservableCollection<Book> Books
@@ -44,7 +45,6 @@ namespace LibManager.Models
         public class Book : INotifyPropertyChanged
         {
             private string _title;
-            private string _owner;
             private string _externalUrl;
             private ObservableCollection<History> _histories;
 
@@ -57,19 +57,6 @@ namespace LibManager.Models
                     {
                         _title = value;
                         OnPropertyChanged(nameof(Title));
-                    }
-                }
-            }
-
-            public string Owner
-            {
-                get => _owner;
-                set
-                {
-                    if (_owner != value)
-                    {
-                        _owner = value;
-                        OnPropertyChanged(nameof(Owner));
                     }
                 }
             }
@@ -127,11 +114,22 @@ namespace LibManager.Models
                     }
                 }
             }
+            public string? Owner
+            {
+                get
+                {
+                    if (Available || LatestHistory == null)
+                    {
+                        return null;
+                    }
+                    return LatestHistory.User;
+                }
+                set {; }
+            }
 
-            public Book(string title, string owner, string donor, string id, string externalUrl)
+            public Book(string title, string donor, string id, string externalUrl)
             {
                 _title = title;
-                _owner = owner;
                 Donor = donor;
                 Id = id;
                 _externalUrl = externalUrl;
@@ -149,11 +147,12 @@ namespace LibManager.Models
                     Debug.WriteLine($"{LatestHistory.User}に借りられています");
                     return;
                 }
-
+                Owner = user;
                 Histories.Add(new History(user));
                 OnPropertyChanged(nameof(Histories));
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(Available));
+                OnPropertyChanged(nameof(Owner));
             }
 
             public void Return(string user)
@@ -170,9 +169,11 @@ namespace LibManager.Models
                     return;
                 }
                 LatestHistory.ReturnDate = DateTime.Now;
+                Owner = null;
                 OnPropertyChanged(nameof(Histories));
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(Available));
+                OnPropertyChanged(nameof(Owner));
             }
 
             public ObservableCollection<History> GetSortedHistories()

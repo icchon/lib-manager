@@ -43,6 +43,8 @@ namespace LibManager
                 services.AddSingleton<WaitingReturnViewModel>();
                 services.AddSingleton<BooksPage>();
                 services.AddSingleton<BooksViewModel>();
+                services.AddSingleton<BookScanPage>();
+                services.AddSingleton<BookScanViewModel>();
 
                 services.AddSingleton<INavigationService, Wpf.Ui.NavigationService>();
                 services.AddSingleton<ISnackbarService, SnackbarService>();
@@ -50,16 +52,13 @@ namespace LibManager
                 services.AddSingleton<IThemeService, ThemeService>();
 
                 services.AddSingleton<BookModels>();
+                services.AddSingleton<User>();
+                services.AddSingleton<ObservalProps>();
             }).Build();
 
         public App()
         {
-            var serviceCollection = new ServiceCollection();
-
-            _serviceProvider = serviceCollection.BuildServiceProvider();
-
-            var mainWindow = _serviceProvider.GetService<MainWindow>();
-            mainWindow?.Show();
+          
         }
         public static T GetService<T>()
             where T : class

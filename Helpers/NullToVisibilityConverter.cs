@@ -8,11 +8,12 @@ using System.Windows.Data;
 
 namespace LibManager.Helpers
 {
-    internal class BooleanToVisibilityConverter : IValueConverter
+    internal class NullToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            bool bValue = (bool)value;
+            string sValue = (string)value;
+            bool bValue = !string.IsNullOrEmpty(sValue);
             bool invert = parameter != null && parameter.ToString().Equals("Inverse", StringComparison.OrdinalIgnoreCase);
             return invert ? (bValue ? Visibility.Collapsed : Visibility.Visible) : (bValue ? Visibility.Visible : Visibility.Collapsed);
         }
