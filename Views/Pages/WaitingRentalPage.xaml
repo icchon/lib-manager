@@ -17,7 +17,26 @@
       mc:Ignorable="d">
 
     <Grid>
-        <TextBlock Text="this is waiting rental page" FontSize="60" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="ユーザーバーコードをスキャンしてください" FontSize="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        
+        <ui:Card Grid.Row="1" Width="250">
+            <StackPanel>
+                <TextBlock Text="ユーザーバーコードがない場合" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                <ui:Card>
+                    <StackPanel>
+                        <ui:TextBox Text="{Binding ViewModel.UserName}"/>
+                        <ui:Button Command="{Binding ViewModel.ConfirmUserNameCommand}"  Margin="0,10,0,0" Content="OK" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </ui:Card>
+            </StackPanel>
+        </ui:Card>
+
+
 
     </Grid>
 </Page>

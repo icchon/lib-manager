@@ -7,16 +7,23 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using Wpf.Ui.Controls;
 using LibManager.Views.Pages;
+using LibManager.Models;
+using System.Diagnostics;
+using System.ComponentModel;
 
 namespace LibManager.ViewModels.Windows
 {
     public partial class MainWindowViewModel : ObservableObject
     {
         private readonly Wpf.Ui.INavigationService _navigationService = App.GetService<Wpf.Ui.INavigationService>();
+        private readonly ObservalProps _props = App.GetService<ObservalProps>();
+
 
         [ObservableProperty]
         private string _applicationTitle = "LibManager";
 
+        [ObservableProperty]
+        private string _userName = ""; 
 
         [ObservableProperty]
         private ObservableCollection<object> _menuItems = new()
@@ -28,6 +35,7 @@ namespace LibManager.ViewModels.Windows
                 TargetPageType = typeof(RentalPage)
             },
    
+            /*
             new NavigationViewItem()
             {
                 Content = "Rental",
@@ -41,14 +49,14 @@ namespace LibManager.ViewModels.Windows
                 Icon = new SymbolIcon {Symbol = SymbolRegular.Send16 },
                 TargetPageType = typeof(WaitingReturnPage),
             },
+            */
 
             new NavigationViewItem()
             {
                 Content = "Books",
-                Icon = new SymbolIcon {Symbol = SymbolRegular.Book16 },
+                Icon = new SymbolIcon {Symbol = SymbolRegular.Book24},
                 TargetPageType = typeof(BooksPage),
             },
-
         };
 
         [ObservableProperty]
@@ -73,11 +81,10 @@ namespace LibManager.ViewModels.Windows
                 //TargetPageType = typeof (RentalPage),
             },
         };
-       
 
-        public MainWindowViewModel()
+        public void UpdateUserName()
         {
-            
+            UserName = _props.NowUser.Name;
         }
     }
 }

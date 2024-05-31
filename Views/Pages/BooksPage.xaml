@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:helpers="clr-namespace:KoemakeLive.Helpers"
+      xmlns:helpers="clr-namespace:LibManager.Helpers"
       xmlns:local="clr-namespace:LibManager.Views.Pages"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -22,12 +22,27 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="this is waiting books page" FontSize="60" VerticalAlignment="Top" HorizontalAlignment="Center"/>
-        <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding ViewModel.Books, Mode=TwoWay}">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Popup IsOpen="{Binding ViewModel.PopUpIsOpen, RelativeSource={RelativeSource AncestorType=Page}}" Placement="Center" StaysOpen="False" AllowsTransparency="True" >
+                <ui:Card Width="250">
+                    <StackPanel>
+                        <TextBlock Text="ユーザーバーコードがない場合" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                        <ui:Card>
+                            <StackPanel>
+                                <ui:TextBox Text="{Binding ViewModel.UserName, RelativeSource={RelativeSource AncestorType=Page}}"/>
+                                <ui:Button Command="{Binding ViewModel.ConfirmUserNameCommand, RelativeSource={RelativeSource AncestorType=Page}}"  Margin="0,10,0,0" Content="OK" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </ui:Card>
+                    </StackPanel>
+                </ui:Card>
+            </Popup>
+        </StackPanel>    
+        
+        <ListBox Grid.Row="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding ViewModel.Books, Mode=TwoWay}">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="Template">
@@ -37,9 +52,11 @@
                                     <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
+                                    <!--
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="DarkGray"/>
-                                    </Trigger>
+    <Setter TargetName="Border" Property="Background" Value="DarkGray"/>
+</Trigger>
+                                    -->
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter TargetName="Border" Property="Background" Value="LightGray"/>
                                     </Trigger>
@@ -56,19 +73,31 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Vertical">
+                            <TextBlock Text="タイトル" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <TextBlock Text="提供" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding Donor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Owner}" Margin="5,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding Available, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <ui:Button Content="バーコード無しで借りる" HorizontalAlignment="Center" Visibility="{Binding Available, Converter={StaticResource BooleanToVisibilityConverter}}" Command="{Binding ViewModel.RentCommand, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" VerticalAlignment="Center"/>
+                            <ui:Button Content="バーコード無しで返す" HorizontalAlignment="Center" Visibility="{Binding Available, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}" Command="{Binding ViewModel.ReturnCommand, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" VerticalAlignment="Center"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Column="0" Text="{Binding Title}" HorizontalAlignment="Center" />
-                        <TextBlock Grid.Column="1" Text="{Binding Owner}" HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="{Binding Donor}" HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Column="3" Text="{Binding Status}" HorizontalAlignment="Center"/>
-                        <ui:Button Grid.Column="4" Content="バーコード無しで借りる" Visibility="{Binding Available, Converter={StaticResource BooleanToVisibilityConverter}}" Command="{Binding ViewModel.RentCommand, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}"/>
-                        <ui:Button Grid.Column="4" Content="バーコード無しで返す" Visibility="{Binding Available, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}" Command="{Binding ViewModel.ReturnCommand, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}"/>
-                        <ToggleButton Grid.Column="5" Content="貸出履歴" x:Name="TogglePopupButton" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,5,5" />
+                        <ToggleButton Grid.Column="4" Content="貸出履歴" x:Name="TogglePopupButton" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,5,5" />
 
                         <Popup 
                                 IsOpen="{Binding IsChecked, ElementName=TogglePopupButton}"

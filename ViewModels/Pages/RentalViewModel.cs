@@ -1,13 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Wpf.Ui;
 using LibManager.Views.Pages;
-using System.Diagnostics;
+using Wpf.Ui.Controls;
 
 namespace LibManager.ViewModels.Pages
 {
