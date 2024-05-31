@@ -14,6 +14,7 @@ using LibManager.Views.Pages;
 using LibManager.ViewModels.Pages;
 using LibManager.Services;
 using Wpf.Ui;
+using LibManager.Models;
 using System;
 
 namespace LibManager
@@ -47,6 +48,8 @@ namespace LibManager
                 services.AddSingleton<ISnackbarService, SnackbarService>();
                 services.AddSingleton<IContentDialogService, ContentDialogService>();
                 services.AddSingleton<IThemeService, ThemeService>();
+
+                services.AddSingleton<BookModels>();
             }).Build();
 
         public App()
