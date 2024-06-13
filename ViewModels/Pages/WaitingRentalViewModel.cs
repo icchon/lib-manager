@@ -11,6 +11,7 @@ using Wpf.Ui.Controls;
 using Wpf.Ui;
 using LibManager.Views.Pages;
 using LibManager.ViewModels.Windows;
+using System.Windows.Automation;
 
 namespace LibManager.ViewModels.Pages
 {
@@ -23,9 +24,11 @@ namespace LibManager.ViewModels.Pages
 
         [ObservableProperty]
         private string _userName = firstTextBoxContent;
+        [ObservableProperty]
+        private string _barCode;
 
         [RelayCommand]
-        private void ConfirmUserName()
+        private async Task ConfirmUserName()
         {
             if (string.IsNullOrEmpty(UserName))
             {
@@ -34,6 +37,7 @@ namespace LibManager.ViewModels.Pages
                 return;
             }
 
+            /*
             if(UserName == firstTextBoxContent)
             {
                 Debug.WriteLine("ユーザー名が入力されていません");
@@ -47,6 +51,7 @@ namespace LibManager.ViewModels.Pages
                 UserName = "ユーザー名が長いです";
                 return;
             }
+            */
 
             User user = new User(UserName);
             _props.NowUser = user;
@@ -54,6 +59,13 @@ namespace LibManager.ViewModels.Pages
             _navigationService.Navigate(typeof(BookScanPage));
 
             _viewModel.UpdateUserName();
+            
         }
+
+        public WaitingRentalViewModel()
+        {
+           
+        }
+        
     }
 }

@@ -32,14 +32,14 @@ namespace LibManager.ViewModels.Pages
         private string _userName = firstTextBoxContent;
 
         [RelayCommand]
-        private void Rent(Book book)
+        private async Task Rent(Book book)
         {
             if (string.IsNullOrEmpty(_props.NowUser.Name))
             {
                 PopUpIsOpen = string.IsNullOrEmpty(_props.NowUser.Name);
                 return;
             }
-            book.Rent(_props.NowUser.Name);
+            await book.Rent(_props.NowUser.Name);
             
         }
         [RelayCommand]
