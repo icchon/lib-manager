@@ -16,6 +16,8 @@ using LibManager.Services;
 using Wpf.Ui;
 using LibManager.Models;
 using System;
+using System.IO;
+using System.Xml.Linq;
 
 namespace LibManager
 {
@@ -24,6 +26,7 @@ namespace LibManager
     /// </summary>
     public partial class App : Application
     {
+        private const string Name = "LibManager";
         private readonly IServiceProvider _serviceProvider;
         private readonly Wpf.Ui.NavigationService _navigationService;
         private static readonly IHost _host = Host
@@ -69,6 +72,28 @@ namespace LibManager
         private void OnStartup(object sender, StartupEventArgs e)
         {
             _host.Start();
+        }
+
+
+        public static string AppFolder
+        {
+            get
+            {
+                string localFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                return Path.Combine(localFolderPath, Name);
+            }
+        }
+        public static string AppDataFolder
+        {
+            get
+            {
+                string path = Path.Combine(AppFolder, "Data");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                return path;
+            }
         }
 
         /// <summary>

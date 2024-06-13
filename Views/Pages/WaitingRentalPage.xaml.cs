@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Wpf.Ui.Controls;
 using LibManager.ViewModels.Pages;
+using System.Windows.Automation;
+using static System.Net.WebRequestMethods;
 
 
 namespace LibManager.Views.Pages
@@ -28,9 +30,52 @@ namespace LibManager.Views.Pages
         public WaitingRentalPage(WaitingRentalViewModel viewModel)
         {
             ViewModel = viewModel;
+            InitializeComponent();
+            var t = new System.Windows.Controls.TextBox();
+            textBox.Focus();
+            textBox.LostKeyboardFocus += (sender, e) => textBox.Focus();
+            
+            
+            textBox.TextChanged += (sender, e) =>
+            {
+                
+                string content = textBox.Text;
+                int length = content.Length;
+                if (length == 0)
+                {
+                    return;
+                }
+                char latestChar = content[length - 1];
+
+                
+                if (!Char.IsDigit(latestChar))
+                {
+                    textBox.Text = content.Substring(0, length - 1);
+                }
+
+                if (length == "1234567890128".Length)
+                {
+                    textBox.Focusable = false;
+                }
+                
+                
+                
+            };
+            
+            
             DataContext = this;
 
-            InitializeComponent();
+            Loaded += WaitingRentalPageLoaded;
+            
         }
+        void WaitingRentalPageLoaded(object sender, RoutedEventArgs e)
+        {
+            textBox.Text = "";
+            textBox.Focusable = true;
+        }
+        
+
+
+
     }
 }

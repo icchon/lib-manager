@@ -109,8 +109,8 @@
                                 Height="200"
                                 Width="600"
                                 VerticalOffset="-300">
-                            <Border Background="AliceBlue" CornerRadius="10" Padding="20">
-                                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemsSource="{Binding Histories, Mode=OneWay}">
+                            <Border Background="WhiteSmoke" CornerRadius="10" Padding="20">
+                                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding Histories, Mode=OneWay}">
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="Template">
@@ -137,11 +137,24 @@
                                         <DataTemplate>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding User}" HorizontalAlignment="Stretch" />
-                                                <TextBlock Grid.Column="1" Text="{Binding IsReturned}" HorizontalAlignment="Center"/>
+                                                <TextBlock Grid.Column="0" Text="{Binding User}" HorizontalAlignment="Center" Margin="0,0,20,0"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <TextBlock Text="貸出日 : " FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding RentalDate}"/>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                    <TextBlock Text="返却日 : " FontWeight="Bold"/>
+                                                    <TextBlock Text="未返却" Foreground="Red" Visibility="{Binding IsReturned, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}"/>
+                                                    <TextBlock Text="{Binding ReturnDate}" Visibility="{Binding IsReturned, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                                
+                                                
+
                                             </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
