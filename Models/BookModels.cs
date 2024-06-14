@@ -18,6 +18,7 @@ using System.Drawing;
 using static System.Net.WebRequestMethods;
 using System.Windows.Media.Imaging;
 using System.Text;
+using System.Collections.Concurrent;
 
 
 namespace LibManager.Models
@@ -26,17 +27,7 @@ namespace LibManager.Models
     public class BookModels : INotifyPropertyChanged
     {
 
-        
-
-        private ObservableCollection<Book> _books = new ObservableCollection<Book>
-        {
-            new Book("OnePiece","donor-1", "00000001", "https://onepiece/not-exist.com"),
-            new Book("DragonBall","donor-2", "00000002", "https://dragonball/not-exist.com"),
-            new Book("Naruto", "donor-3", "00000003", "https://naruto/not-exist.com")
-        };
-
-
-        
+        private ObservableCollection<Book> _books = new ObservableCollection<Book>();
         public ObservableCollection<Book> Books
         {
             get => _books;
@@ -52,7 +43,7 @@ namespace LibManager.Models
 
         public ObservableCollection<Book> GetSortedBooks()
         {
-            _books = new ObservableCollection<Book>(_books.OrderBy(books => books.Title).ToList());
+            _books = new ObservableCollection<Book>(_books.OrderBy(books => books.IntegratedInfo.Title).ToList());
             return _books;
         }
 
@@ -61,72 +52,150 @@ namespace LibManager.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        public class IntegratedInfo
+        {
+            public BitmapImage? ImageSource { get; set; } = null;
+            public string? Title { get; set; } = null;
+            public string? ExternalUrl { get; set; } = null;
+            public List<string>? Authors { get; set; } = null;
+            public string? PublishedDate { get; set; }= null;
+            public string? Description { get; set; } = null;
+
+        }
 
         public class Book : INotifyPropertyChanged
         {
-            private string _title;
-            private string _externalUrl;
             private ObservableCollection<History> _histories;
             private HttpClient _client = new HttpClient();
 
-            private JsonSerializerOptions _options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-                WriteIndented = true,
-                AllowTrailingCommas = true,
-                PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-            };
-
             public GoogleStructure.BookInfo? GoogleBookInfo { get; set; }
-            public Image NDLImage { get; set; }
+            public BitmapImage? NDLImageSource { get; set; }
             public OpenBDStructure.BookInfo? OpenBDBookInfo { get; set; }
 
-            private async Task GetBookInfoAsync(string isbnCode)
+            public IntegratedInfo IntegratedInfo { get; set; } = new IntegratedInfo();
+
+            public async Task GetBookInfoAsync()
             {
-                string url = String.Concat(GoogleStructure.BaseUrl, isbnCode);
+                string url = String.Concat(GoogleStructure.BaseUrl, Isbn);
                 try
                 {
                     HttpResponseMessage response = await _client.GetAsync(url);
                     if (response.IsSuccessStatusCode)
                     {
                         var document = await response.Content.ReadAsStringAsync();
-                        GoogleBookInfo = JsonSerializer.Deserialize<GoogleStructure.BookInfo>(document, _options);
+                        GoogleBookInfo = JsonSerializer.Deserialize<GoogleStructure.BookInfo>(document, GoogleStructure.Options);
                         Debug.WriteLine("GoogleBooksAPI");
                         Debug.WriteLine(document);
+
+                        try
+                        {
+                            var volumeInfo = GoogleBookInfo.Items.FirstOrDefault().VolumeInfo;
+                            Debug.WriteLine($"{GoogleBookInfo.Items.FirstOrDefault().Kind}");
+                            string? title = volumeInfo?.Title;
+                            string? externalUrl = volumeInfo?.InfoLink;
+                            List<string>? authors = volumeInfo?.Authors;
+                            string? publishDate = volumeInfo?.PublishedDate;
+                            string? description = volumeInfo?.Description;
+                            BitmapImage? imageSource = null;
+
+                            string? imageLink = volumeInfo.ImageLinks.SmallThumbnail;
+                            response = await _client.GetAsync(imageLink);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                using (Stream stream = await response.Content.ReadAsStreamAsync())
+                                {
+                                    string savePath = Path.Combine(App.AppDataFolder, Isbn+".bmp");
+                                    using (FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                                    {
+                                        stream.CopyTo(fileStream);
+                                    }
+                                    imageSource = new BitmapImage(new Uri(savePath));
+                                }
+
+                            }
+                            else
+                            {
+                                Debug.WriteLine($"Failed to get GoogleBooksAPIImage response, status code : {response.StatusCode}");
+                            }
+
+                            IntegratedInfo.Title = title;
+                            IntegratedInfo.ExternalUrl = externalUrl;
+                            IntegratedInfo.Authors = authors;
+                            IntegratedInfo.Description = description;
+                            IntegratedInfo.PublishedDate = publishDate;
+                            IntegratedInfo.ImageSource = imageSource;
+                        }catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error: {ex.Message}");
+                        }
+                        
+
                     }
                     else
                     {
                         Debug.WriteLine($"Failed to get GoogleBookAPI response, status code : {response.StatusCode}");
                     }
 
-                    url = String.Concat(OpenBDStructure.BaseUrl, isbnCode);
+                    url = String.Concat(OpenBDStructure.BaseUrl, Isbn);
                     response = await _client.GetAsync(url);
                     if (response.IsSuccessStatusCode)
                     {
                         var document = await response.Content.ReadAsStringAsync();
-                        OpenBDBookInfo = JsonSerializer.Deserialize<List<OpenBDStructure.BookInfo>>(document, _options).FirstOrDefault();
+                        OpenBDBookInfo = JsonSerializer.Deserialize<List<OpenBDStructure.BookInfo>>(document, OpenBDStructure.Options).FirstOrDefault();
                         Debug.WriteLine("OpenDL");
                         Debug.WriteLine(document);
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"Failed to get OpenBDAPI response, status code : {response.StatusCode}");
-                    }
 
-                    url = $"{NDLStructure.BaseUrl}{isbnCode}.jpg";
-                    response = await _client.GetAsync(url);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        using (Stream stream = await response.Content.ReadAsStreamAsync())
+                        var summery = OpenBDBookInfo?.Summary;
+                        string? title = summery?.Title;
+                        string? pubDate = summery?.Pubdate;
+                        List<string>? authors = new List<string>
                         {
-                            NDLImage = Image.FromStream(stream);
+                            summery?.Author,
+                        };
+
+                        if(IntegratedInfo.Title == null)
+                        {
+                            IntegratedInfo.Title = title;
+                        }
+                        if(IntegratedInfo.PublishedDate == null)
+                        {
+                            IntegratedInfo.PublishedDate= pubDate;
+                        }
+                        if(IntegratedInfo.Authors == null)
+                        {
+                            IntegratedInfo.Authors = authors;
                         }
 
                     }
                     else
                     {
                         Debug.WriteLine($"Failed to get OpenBDAPI response, status code : {response.StatusCode}");
+                    }
+
+                    url = $"{NDLStructure.BaseUrl}{Isbn}.jpg";
+                    Debug.WriteLine(url);
+                    response = await _client.GetAsync(url);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        using (Stream stream = await response.Content.ReadAsStreamAsync())
+                        {
+                            string savePath = Path.Combine(App.AppDataFolder, Isbn + ".bmp");
+                            using (FileStream fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                            {
+                                stream.CopyTo(fileStream);
+                            }
+                            NDLImageSource = new BitmapImage(new Uri(savePath));
+                        }
+
+                        if (IntegratedInfo.ImageSource == null)
+                        {
+                            IntegratedInfo.ImageSource = NDLImageSource;
+                        }
+
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Failed to get NDLAPI response, status code : {response.StatusCode}");
                     }
 
                     
@@ -136,41 +205,11 @@ namespace LibManager.Models
                 {
                     Debug.WriteLine($"API Response Error : {ex.Message}");
                 }
-                
 
 
-            }
-
-            public string Title
-            {
-                get => _title;
-                set
-                {
-                    if (_title != value)
-                    {
-                        _title = value;
-                        OnPropertyChanged(nameof(Title));
-                    }
-                }
             }
 
             public string Donor { get; set; }
-
-            public string Id { get; set; }
-
-            public string ExternalUrl
-            {
-                get => _externalUrl;
-                set
-                {
-                    if (_externalUrl != value)
-                    {
-                        _externalUrl = value;
-                        OnPropertyChanged(nameof(ExternalUrl));
-                    }
-                }
-            }
-
             public DateTime DonoredDate { get; set; }
 
             public string Status
@@ -219,21 +258,19 @@ namespace LibManager.Models
                 }
                 set {; }
             }
+            public string? Isbn { get; set; }
 
-            public Book(string title, string donor, string id, string externalUrl)
+            public Book(string donor, string isbn)
             {
-                _title = title;
                 Donor = donor;
-                Id = id;
-                _externalUrl = externalUrl;
+                Isbn = isbn;
                 DonoredDate = DateTime.Now;
                 _histories = new ObservableCollection<History>();
 
             }
 
-            public async Task Rent(string user)
+            public void Rent(string user)
             {
-                await GetBookInfoAsync("9784807908363");
 
                 if (!Available && LatestHistory != null)
                 {
@@ -249,19 +286,21 @@ namespace LibManager.Models
                 OnPropertyChanged(nameof(Owner));
             }
 
-            public void Return(string user)
+            public void Return()
             {
                 if(LatestHistory == null)
                 {
                     Debug.WriteLine("借りられていないのに返そうとしています");
                     return;
                 }
+                /*
 
                 if(LatestHistory.User != user)
                 {
                     Debug.WriteLine($"借りた人{LatestHistory.User}と返す人{user}が一致しません");
                     return;
                 }
+                */
                 LatestHistory.ReturnDate = DateTime.Now;
                 Owner = null;
                 OnPropertyChanged(nameof(Histories));

@@ -1,5 +1,6 @@
 ﻿
 
+using System.Text.Json;
 using static System.Net.WebRequestMethods;
 
 namespace LibManager.Models.JsonStructures
@@ -11,6 +12,15 @@ namespace LibManager.Models.JsonStructures
     public class GoogleStructure
     {
         public const string BaseUrl = "https://www.googleapis.com/books/v1/volumes?q=isbn:";
+
+        public static readonly JsonSerializerOptions Options = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            AllowTrailingCommas = true,
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+        };
         public class VolumeInfo
         {
             public string? Title { get; set; }
@@ -116,6 +126,15 @@ namespace LibManager.Models.JsonStructures
     public class OpenBDStructure
     {
         public const string BaseUrl = "https://api.openbd.jp/v1/get?isbn=";
+
+        public static readonly JsonSerializerOptions Options = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            WriteIndented = true,
+            AllowTrailingCommas = true,
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+        };
         public class BookInfo
         {
             public Onix? Onix { get; set; }

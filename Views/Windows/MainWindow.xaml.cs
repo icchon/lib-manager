@@ -50,7 +50,7 @@ namespace LibManager.Views.Windows
 
         private  void MainWindowLoaded(object sender, RoutedEventArgs e)
         {
-            _navigationService.Navigate(typeof(RentalPage));
+            _navigationService.Navigate(typeof(HomePage));
         }
 
 
