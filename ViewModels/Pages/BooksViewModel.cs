@@ -13,7 +13,6 @@ namespace LibManager.ViewModels.Pages
     public partial class BooksViewModel : ObservableObject
     {
         private readonly BookModels _bookModels;
-        private const string firstTextBoxContent = "ここにユーザー名を入力してください";
         private ObservalProps _props; 
         private readonly INavigationService _navigationService = App.GetService<INavigationService>();
 
@@ -26,59 +25,6 @@ namespace LibManager.ViewModels.Pages
 
         [ObservableProperty]
         private ObservableCollection<Book> _books;
-        [ObservableProperty]
-        private bool _popUpIsOpen = false;
-        [ObservableProperty]
-        private string _userName = firstTextBoxContent;
 
-        [RelayCommand]
-        private async Task Rent(Book book)
-        {
-            if (string.IsNullOrEmpty(_props.NowUser.Name))
-            {
-                PopUpIsOpen = string.IsNullOrEmpty(_props.NowUser.Name);
-                return;
-            }
-            await book.Rent(_props.NowUser.Name);
-            
-        }
-        [RelayCommand]
-        private void Return(Book book)
-        {
-            var latestHistory = book.LatestHistory;
-            if(latestHistory == null)
-            {
-                Debug.WriteLine("借りられた履歴がないのに返そうとしています");
-                return;
-            }
-            book.Return(latestHistory.User);
-        }
-
-       
-        [RelayCommand]
-        private void ConfirmUserName()
-        {
-            if (!string.IsNullOrEmpty(_props.NowUser.Name))
-            {
-                Debug.WriteLine("すでにユーザー名が入力されています");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(UserName))
-            {
-                Debug.WriteLine("ユーザ名が空です");
-                UserName = "ユーザー名が空です";
-            }
-
-            if (UserName == firstTextBoxContent)
-            {
-                Debug.WriteLine("ユーザー名が入力されていません");
-                UserName = "ユーザー名が入力されていません";
-            }
-            User user = new User(UserName);
-            _props.NowUser = user;
-            PopUpIsOpen = false;
-
-        }
     }
 }

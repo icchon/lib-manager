@@ -25,6 +25,12 @@
   <ItemGroup>
 	  <Resource Include="Assets\title-icon.png" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\Pages\ReturnSuccessPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 	
 	
 	

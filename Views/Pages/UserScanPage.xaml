@@ -1,4 +1,4 @@
-﻿<Page x:Class="LibManager.Views.Pages.WaitingRentalPage"
+﻿<Page x:Class="LibManager.Views.Pages.UserScanPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
       xmlns:local="clr-namespace:LibManager.Views.Pages"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      Title="WaitingRentalPage"
+      Title="UserScanlPage"
       
       d:DesignHeight="450"
       d:DesignWidth="800"
@@ -19,29 +19,14 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <TextBox x:Name="textBox" Opacity="0.0"/>
+        
         <StackPanel Grid.Row="0" VerticalAlignment="Center">
             <TextBlock Text="ユーザーバーコードをスキャンしてください" FontSize="50" HorizontalAlignment="Center"/>
-            <TextBox x:Name="textBox" HorizontalAlignment="Center"/>
         </StackPanel>
-            
-        
-        
-        <ui:Card Grid.Row="1" Width="250">
-            <StackPanel>
-                <TextBlock Text="ユーザーバーコードがない場合" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                <ui:Card>
-                    <StackPanel>
-                        <ui:TextBox Text="{Binding ViewModel.UserName}"/>
-                        <ui:Button Command="{Binding ViewModel.ConfirmUserNameCommand}"  Margin="0,10,0,0" Content="OK" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </ui:Card>
-            </StackPanel>
-        </ui:Card>
 
-
-
+       
     </Grid>
 </Page>

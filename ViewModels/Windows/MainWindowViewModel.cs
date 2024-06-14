@@ -32,24 +32,25 @@ namespace LibManager.ViewModels.Windows
             {
                 Content = "Home",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.Home12 },
-                TargetPageType = typeof(RentalPage)
+                TargetPageType = typeof(HomePage)
             },
    
             /*
             new NavigationViewItem()
             {
-                Content = "Rental",
+                Content = "Add",
                 Icon = new SymbolIcon {Symbol = SymbolRegular.HandLeft16 },
-                TargetPageType = typeof(WaitingRentalPage),
+                TargetPageType = typeof(AddBookPage),
             },
 
             new NavigationViewItem()
             {
-                Content = "Return",
-                Icon = new SymbolIcon {Symbol = SymbolRegular.Send16 },
-                TargetPageType = typeof(WaitingReturnPage),
+                Content = "User",
+                Icon = new SymbolIcon {Symbol = SymbolRegular.HandRight16 },
+                TargetPageType = typeof(UserScanPage),
             },
             */
+           
 
             new NavigationViewItem()
             {

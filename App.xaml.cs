@@ -18,6 +18,7 @@ using LibManager.Models;
 using System;
 using System.IO;
 using System.Xml.Linq;
+using System.Runtime.Serialization;
 
 namespace LibManager
 {
@@ -35,19 +36,31 @@ namespace LibManager
             {
                 services.AddHostedService<ApplicationHostService>();
 
+
+                services.AddSingleton<BarcodeService>();
+
                
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<MainWindowViewModel>();
-                services.AddSingleton<RentalPage>();
-                services.AddSingleton<RentalViewModel>();
-                services.AddSingleton<WaitingRentalPage>();
-                services.AddSingleton<WaitingRentalViewModel>();
-                services.AddSingleton<WaitingReturnPage>();
-                services.AddSingleton<WaitingReturnViewModel>();
+                services.AddSingleton<HomePage>();
+                services.AddSingleton<HomeViewModel>();
+                services.AddSingleton<UserScanPage>();
+                services.AddSingleton<UserScanViewModel>();
+                services.AddSingleton<ReturnBookScanPage>();
+                services.AddSingleton<ReturnBookScanViewModel>();
                 services.AddSingleton<BooksPage>();
                 services.AddSingleton<BooksViewModel>();
-                services.AddSingleton<BookScanPage>();
-                services.AddSingleton<BookScanViewModel>();
+                services.AddSingleton<RentalBookScanPage>();
+                services.AddSingleton<RentalBookScanViewModel>();
+                services.AddSingleton<AddBookPage>();
+                services.AddSingleton<AddBookViewModel>();
+                services.AddSingleton<AddBookSuccessPage>();
+                services.AddSingleton<AddBookSuccessViewModel>();
+                services.AddSingleton<RentalSuccessPage>();
+                services.AddSingleton<RentalSuccessViewModel>();
+                services.AddSingleton<ReturnSuccessPage>();
+                services.AddSingleton<ReturnSuccessViewModel>();
+
 
                 services.AddSingleton<INavigationService, Wpf.Ui.NavigationService>();
                 services.AddSingleton<ISnackbarService, SnackbarService>();
