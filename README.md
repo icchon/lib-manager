@@ -3,7 +3,7 @@
 
 <p align="center">WPFで開発された簡易書籍管理システム</p>
 
-<p align="center"><a href="./LICENSE"><img src="https://img.shields.io/github/license/icchon/LibManager" alt="license"></a></p>
+<p align="center"><a href="./LICENSE"><img src="https://img.shields.io/github/license/icchon/lib-manager" alt="license"></a></p>
 
 <br>
 
